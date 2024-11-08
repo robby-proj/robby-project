@@ -1,7 +1,7 @@
 /* An example sketch created for BLE project demonstrating both transmission and
 reception of BLE messages.
 * This sketch will transmit selected sensor measurements via BLE to the
-  example Flutter app (tested on Android), 'Numorpho Nicla App'.
+  example Flutter app (tested on Android),  'Nicla App'.
 * This sketch accepts control commands from the BLE App which switches the
   onboard LED.
 
