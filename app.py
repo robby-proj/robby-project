@@ -75,21 +75,6 @@ class ArduinoCloudSender:
         self.client[VAR_LAST_SCORE] = score
         self.client[VAR_LAST_TS] = ts
 
-    def send(self, payload: dict):
-        """
-        payload = {"label": "person"|"dog", "score": float, "ts": int, ...}
-        """
-        label = payload.get("label", "")
-        score = float(payload.get("score", 0.0))
-        ts = int(payload.get("ts", int(time.time())))
-
-        # Update your Thing variables
-        self.client[VAR_PERSON] = (label == "person")
-        self.client[VAR_DOG] = (label == "dog")
-        self.client[VAR_LAST_LABEL] = label
-        self.client[VAR_LAST_SCORE] = score
-        self.client[VAR_LAST_TS] = ts
-
 
 def main():
     # TFLite runtime
