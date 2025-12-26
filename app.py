@@ -186,6 +186,12 @@ def main():
         classes = interpreter.get_tensor(out_details[1]["index"])[0].astype(np.int32)
         scores = interpreter.get_tensor(out_details[2]["index"])[0]
 
+        # ---- DEBUG: console-only detection output ----
+        for cls, score in zip(classes, scores):
+            if score > 0.2:
+                print("DETECTION:", int(cls), float(score))
+        # --------------------------------------------
+
         # Find best person/dog detection above threshold
         best = None
         for cls, score, box in zip(classes, scores, boxes):
