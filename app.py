@@ -41,17 +41,12 @@ def load_labels(path: str) -> dict[int, str]:
 
 
 class ArduinoCloudSender:
-    """
-    Persistent connection to Arduino IoT Cloud.
-    Writes values to Cloud Variables of your Thing.
-    """
     def __init__(self):
         if not ARDUINO_DEVICE_ID or not ARDUINO_SECRET_KEY:
             raise RuntimeError("Missing ARDUINO_DEVICE_ID or ARDUINO_SECRET_KEY")
 
         from arduino_iot_cloud import ArduinoCloudClient
 
-        # For Arduino IoT Cloud: username=device_id, password=secret_key
         self.client = ArduinoCloudClient(
             device_id=ARDUINO_DEVICE_ID,
             username=ARDUINO_DEVICE_ID,
@@ -65,8 +60,20 @@ class ArduinoCloudSender:
         self.client.register(VAR_LAST_SCORE)
         self.client.register(VAR_LAST_TS)
 
-        # Start background MQTT loop
+        # Start background loop
         self.client.start()
+        print("Arduino Cloud client started")
+
+    def send(self, payload: dict):
+        label = payload.get("label", "")
+        score = float(payload.get("score", 0.0))
+        ts = int(payload.get("ts", int(time.time())))
+
+        self.client[VAR_PERSON] = (label == "person")
+        self.client[VAR_DOG] = (label == "dog")
+        self.client[VAR_LAST_LABEL] = label
+        self.client[VAR_LAST_SCORE] = score
+        self.client[VAR_LAST_TS] = ts
 
     def send(self, payload: dict):
         """
