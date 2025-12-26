@@ -3,25 +3,20 @@ services:
     build: .
     container_name: camdetect
     restart: unless-stopped
+
     devices:
-"/dev/video0:/dev/video0"
+      - "/dev/video0:/dev/video0"
 
     environment:
-      # Camera / model config
-CAMERA_INDEX=0
-SCORE_THRESH=0.55
-COOLDOWN_SEC=10
+      - CAMERA_INDEX=0
+      - SCORE_THRESH=0.55
+      - COOLDOWN_SEC=10
+      - ALERT_MODE=arduino_cloud
+      - ARDUINO_DEVICE_ID=YOUR_DEVICE_ID
+      - ARDUINO_SECRET_KEY=YOUR_SECRET_KEY
 
-      # Use Arduino IoT Cloud instead of local MQTT broker
-ALERT_BACKEND=arduino_cloud
-
-      # Arduino IoT Cloud provisioning (save these from Cloud)
-ARDUINO_DEVICE_ID=YOUR_DEVICE_ID
-ARDUINO_SECRET_KEY=YOUR_SECRET_KEY
-
-      # Your Arduino Cloud variable names (must match your Thing variables)
-VAR_PERSON=person_detected
-VAR_DOG=dog_detected
-VAR_LAST_LABEL=last_label
-VAR_LAST_SCORE=last_score
-VAR_LAST_TS=last_ts
+      - VAR_PERSON=person_detected
+      - VAR_DOG=dog_detected
+      - VAR_LAST_LABEL=last_label
+      - VAR_LAST_SCORE=last_score
+      - VAR_LAST_TS=last_ts
