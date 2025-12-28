@@ -117,17 +117,7 @@ class ArduinoCloudSender:
         self.client[VAR_DOG] = (label == "dog")
         self.client[VAR_LAST_LABEL] = str(label)
         self.client[VAR_LAST_SCORE] = float(score)
-        self.client[VAR_LAST_TS] = int(ts)
-
-   def get_last_label(best):
-       if best is None:
-           return "No detection"
-       if best["class_id"] == COCO_PERSON:
-           return "person"
-       if best["class_id"] == COCO_DOG:
-           return "dog"
-       return "No detection"
-        
+        self.client[VAR_LAST_TS] = int(ts)      
 
 def main():
     # TFLite runtime
@@ -212,8 +202,7 @@ def main():
 
         # Cooldown + publish
         if best and (now - last_alert_ts) >= COOLDOWN_SEC:
-            #label = "person" if best["class_id"] == COCO_PERSON else "dog"
-            label = get_last_label(best)
+            label = "person" if best["class_id"] == COCO_PERSON else "dog"
             payload_ts = int(now)
             logging.info("DETECTED: %s score=%.3f", label, best["score"])
 
