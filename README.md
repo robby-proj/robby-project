@@ -1,8 +1,10 @@
-[Interface]
-Address = 10.8.0.1/24
-ListenPort = 51820
-PrivateKey = PRIVATE_KEY
-SaveConfig = true
+mkdir -p camera-detect/models
+cd camera-detect/models
 
-PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o wlan0 -j MASQUERADE
+# Download a common SSD MobileNet V1 model + labels
+wget -O detect.tflite https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip
+unzip detect.tflite -d tmp || true
+# The zip usually contains a .tflite; if unzip didn't work because it's not a zip on your side, use the alternative below.
+
+# Alternative (most reliable): use a known raw tflite + labels hosted on GitHub
+cd ..
