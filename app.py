@@ -19,8 +19,8 @@ SCORE_THRESH = float(os.getenv("SCORE_THRESH", "0.55"))
 COOLDOWN_SEC = int(os.getenv("COOLDOWN_SEC", "10"))
 
 # COCO IDs
-COCO_PERSON = 1
-COCO_DOG = 18
+COCO_PERSON = 0
+COCO_DOG = 17
 
 # Arduino IoT Cloud credentials (from docker-compose.yml env vars)
 ARDUINO_DEVICE_ID = os.getenv("ARDUINO_DEVICE_ID", "")
@@ -119,6 +119,15 @@ class ArduinoCloudSender:
         self.client[VAR_LAST_SCORE] = float(score)
         self.client[VAR_LAST_TS] = int(ts)
 
+   def get_last_label(best):
+       if best is None:
+           return "No detection"
+       if best["class_id"] == COCO_PERSON:
+           return "person"
+       if best["class_id"] == COCO_DOG:
+           return "dog"
+       return "No detection"
+        
 
 def main():
     # TFLite runtime
@@ -203,7 +212,8 @@ def main():
 
         # Cooldown + publish
         if best and (now - last_alert_ts) >= COOLDOWN_SEC:
-            label = "person" if best["class_id"] == COCO_PERSON else "dog"
+            #label = "person" if best["class_id"] == COCO_PERSON else "dog"
+            label = get_last_label(best)
             payload_ts = int(now)
             logging.info("DETECTED: %s score=%.3f", label, best["score"])
 
