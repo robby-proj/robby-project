@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py /app/
 COPY models /app/models
 
-ENV MODEL_PATH=/app/models/tmp/detect.tflite
-ENV LABELS_PATH=/app/models/tmp/labelmap.txt
+ENV MODEL_PATH=/app/models/detect.tflite
+ENV LABELS_PATH=/app/models/labelmap.txt
 
 CMD ["python", "-u", "app.py"]
