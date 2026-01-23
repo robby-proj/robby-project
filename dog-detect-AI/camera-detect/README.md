@@ -90,7 +90,9 @@ services:
 
 Run these commands in the directory:
 ```
-cd ~/camera-detect/models
+cd ~/camera-detect
+mkdir -p models
+cd models
 ```
 Model
 ```
@@ -115,3 +117,47 @@ Ensure models and labels are exactly here.
 
 ls -la ./models
 ```
+# :arrow_forward: Running the Project
+
+Build & Start
+```
+docker compose up -d --build
+```
+view Logs
+```
+docker logs -f camdetect
+```
+You should see logs like :
+```
+DETECTION: 17 0.58
+INFO: DETECTED: dog score=0.580
+```
+
+# :stopwatch: 6-Hour Detection Report
+
+This project includes an automatic 6-hour activity report generated directly by the detection container.
+
+:page_facing_up: Report Format
+
+Every 6 hours, the system sends a summary report to Arduino IoT Cloud in the following format:
+
+```
+report ( person detected: 1.2 hours, dog detected: 4.6 hours )
+```
+
+# :brain: How the Report Works
+- The camera runs continuous object detection.
+- Each frame contributes time to:
+	- Person detected
+	- Dog detected
+ 	- No detection
+- Time is accumulated internally.
+- Every 6 hours:
+	-  Totals are calculated
+ 	-  The report string is sent to the cloud
+  	-  Counters reset for the next period
+
+This allows you to:
+* Measure how long your dog stays in bed
+* Detect human activity vs pet activity
+* Track behavior patterns over time
