@@ -19,7 +19,7 @@ camera-detect/
 ├── requirements.txt
 ├── models/
 │   ├── detect.tflite
-│   └── labelmap.txt  
+│   └── labels.txt  
 └── README.md
 ```
 
