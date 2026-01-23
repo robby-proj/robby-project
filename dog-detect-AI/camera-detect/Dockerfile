@@ -13,6 +13,6 @@ COPY app.py /app/
 COPY models /app/models
 
 ENV MODEL_PATH=/app/models/detect.tflite
-ENV LABELS_PATH=/app/models/labelmap.txt
+ENV LABELS_PATH=/app/models/labels.txt
 
 CMD ["python", "-u", "app.py"]
