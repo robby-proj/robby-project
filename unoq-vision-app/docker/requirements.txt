@@ -1,0 +1,5 @@
+flask
+pyserial
+opencv-python
+numpy
+pillow
