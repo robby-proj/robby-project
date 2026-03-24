@@ -379,4 +379,3 @@ yzma lib:
 app folder:
   /home/arduino/ArduinoApps/unoq-vision-app
 ```
-"""
