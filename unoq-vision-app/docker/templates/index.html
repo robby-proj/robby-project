@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNO Q Vision + VLM</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .status {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .meta {
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .imgbox img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 12px;
+    }
+    .chatbox {
+      height: 560px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 12px;
+      background: #fafafa;
+    }
+    .msg {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      max-width: 88%;
+      line-height: 1.4;
+    }
+    .msg.system { background: #ececec; color: #222; }
+    .msg.user { background: #dbeafe; margin-left: auto; }
+    .msg.assistant { background: #dcfce7; }
+    .role {
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 4px;
+      opacity: 0.8;
+    }
+    .toolbar {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+    button:hover { background: #1d4ed8; }
+    .result {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+    }
+    h3 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>UNO Q Vision Detection + VLM Chatbox</h1>
+    <div class="grid">
+      <div class="card">
+        <div class="status">Status: <span id="status">loading...</span></div>
+        <div class="meta">Last event: <span id="last_event">-</span></div>
+
+        <h3>Latest crop sent to VLM</h3>
+        <div class="imgbox">
+          <img id="latest_image" src="" alt="No cropped image yet" />
+        </div>
+
+        <h3>Latest full frame</h3>
+        <div class="imgbox">
+          <img id="latest_full" src="" alt="No full image yet" />
+        </div>
+
+        <div class="toolbar">
+          <button onclick="manualTrigger()">Manual trigger</button>
+        </div>
+
+        <div class="result">
+          <strong>Latest VLM result:</strong>
+          <div id="last_result">No result yet.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Chat widget</h3>
+        <div id="chatbox" class="chatbox"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function manualTrigger() {
+      await fetch('/api/manual_trigger', { method: 'POST' });
+    }
+
+    function renderChat(messages) {
+      const chatbox = document.getElementById('chatbox');
+      chatbox.innerHTML = '';
+      messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'msg ' + msg.role;
+        div.innerHTML = `
+          <div class="role">${msg.role}${msg.time ? ' · ' + msg.time : ''}</div>
+          <div>${msg.text}</div>
+        `;
+        chatbox.appendChild(div);
+      });
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    async function refreshState() {
+      const res = await fetch('/api/state');
+      const data = await res.json();
+
+      document.getElementById('status').textContent = data.status || '-';
+      document.getElementById('last_event').textContent = data.last_event_time || '-';
+      document.getElementById('last_result').textContent = data.last_result || 'No result yet.';
+
+      const img = document.getElementById('latest_image');
+      if (data.last_image) {
+        img.src = '/images/' + data.last_image + '?t=' + Date.now();
+      } else {
+        img.removeAttribute('src');
+      }
+
+      const full = document.getElementById('latest_full');
+      if (data.last_full_image) {
+        full.src = '/images/' + data.last_full_image + '?t=' + Date.now();
+      } else {
+        full.removeAttribute('src');
+      }
+
+      renderChat(data.chat_messages || []);
+    }
+
+    refreshState();
+    setInterval(refreshState, 2000);
+  </script>
+</body>
+</html>
