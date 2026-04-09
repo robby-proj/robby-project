@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Go because yzma examples are run with `go run`
-RUN curl -fsSL https://go.dev/dl/go1.23.6.linux-arm64.tar.gz -o /tmp/go.tar.gz \
+RUN curl -fsSL https://go.dev/dl/go1.25.0.linux-arm64.tar.gz -o /tmp/go.tar.gz \
     && rm -rf /usr/local/go \
     && tar -C /usr/local -xzf /tmp/go.tar.gz \
     && rm /tmp/go.tar.gz
