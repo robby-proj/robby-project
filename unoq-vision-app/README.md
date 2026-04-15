@@ -10,12 +10,17 @@ Your recommended current directory layout:
 ├── yolo-export-venv
 └── yzma
 ```
+If you are cloning this repository robby-project, execute this command to have it as recommended by the previous directory layout:
 
+```
+cp -a /home/arduino/robby-project/unoq-vision-app/ /home/arduino/ArduinoApps/
+```
 Your app folder is:
 
 ```text
 /home/arduino/ArduinoApps/unoq-vision-app
 ```
+
 
 Your model storage folder is:
 
@@ -106,6 +111,39 @@ Because exporting directly on the UNO Q was unreliable, the working method is:
 
 1. export `yolov8n.onnx` on your Mac or another stronger machine
 2. copy it into the UNO Q model folder
+### On Windows PC
+Create and activate a Python environment:
+```bash
+python -m venv $HOME\yolo-export-venv
+```
+```bash
+python -m venv $HOME\yolo-export-venv\Scripts\Activate.ps1
+```
+```bash
+python -m pip install --upgrade pip
+```
+```bash
+pip install ultralytics onnx
+```
+```bash
+New-Item -ItemType Directory -Force -Path $HOME\yolo-export
+```
+```bash
+Set-Location $HOME\yolo-export
+```
+Export the ONNX model
+```bash
+python -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt'); model.export(format='onnx', imgsz=640)"
+```
+Verify the file exists
+```bash
+Get-ChildItem
+Get-ChildItem -Recurse -Filter *.onnx
+````
+You should see a file named:
+```bash
+yolov8n.onnx
+```
 
 ### On your Mac
 Create and activate a Python environment:
@@ -140,6 +178,38 @@ You want an output file named:
 
 ```text
 yolov8n.onnx
+```
+
+### Directly from your Uno Q
+```bash
+mkdir -p /home/arduino/models/coco
+```
+```bash
+cd /home/arduino/models/coco
+```
+```bash
+wget -O yolov8n.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt
+```
+```bash
+ls -lh yolov8n.pt
+```
+```bash
+python3 -m venv /home/arduino/yolo-export-venv
+```
+```bash
+source /home/arduino/yolo-export-venv/bin/activate
+```
+```bash
+python -m pip install --upgrade pip
+```
+```bash
+pip install ultralytics onnx
+```
+```bash
+python -c "from ultralytics import YOLO; model = YOLO('/home/arduino/models/coco/yolov8n.pt'); model.export(format='onnx', imgsz=640)"
+```
+```bash
+ls -lh *.onnx
 ```
 
 ---
