@@ -493,4 +493,6 @@ docker compose down
 ```bash
 docker compose up -d --force-recreate
 ```
-
+```bash
+docker compose logs -f
+```
