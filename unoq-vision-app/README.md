@@ -196,6 +196,10 @@ ls -lh yolov8n.pt
 ```bash
 python3 -m venv /home/arduino/yolo-export-venv
 ```
+If fails on the venv command then re-install the python venv dependency:
+```bash
+sudo apt install python3.13-venv
+````
 ```bash
 source /home/arduino/yolo-export-venv/bin/activate
 ```
@@ -342,12 +346,26 @@ On the UNO Q:
 ```bash
 ls -lh /home/arduino/models
 ```
-
 You should see:
 
 ```text
 SmolVLM2-500M-Video-Instruct-Q8_0.gguf
 mmproj-SmolVLM2-500M-Video-Instruct-Q8_0.gguf
+```
+If you don't have the VLM models, let's start getting the mmproj-SmolVLM2 model:
+```bash
+wget -O mmproj-SmolVLM2-500M-Video-Instruct-Q8_0.gguf "https://huggingface.co/ggml-org/SmolVLM2-500M-Video-Instruct-GGUF/resolve/main/mmproj-SmolVLM2-500M-Video-Instruct-Q8_0.gguf"
+```
+Verify:
+```bash
+ls -lh /home/arduino/models/mmproj-SmolVLM2-500M-Video-Instruct-Q8_0.gguf
+```
+Now, let's get the SmoLVLM2 model:
+```bash
+wget -O SmolVLM2-500M-Video-Instruct-Q8_0.gguf "https://huggingface.co/ggml-org/SmolVLM2-500M-Video-Instruct-GGUF/resolve/main/SmolVLM2-500M-Video-Instruct-Q8_0.gguf"
+```
+```bash
+ls -lh /home/arduino/models/SmolVLM2-500M-Video-Instruct-Q8_0.gguf
 ```
 
 ---
@@ -361,15 +379,31 @@ cd /home/arduino/yzma
 ls
 ls /home/arduino/yzma/lib
 ```
+If you don't have the folder at all:
 
-If the `lib` folder is missing or incomplete:
+```bash
+cd /home/arduino
+```
+Install go and yzma:
+```bash
+sudo apt update 
+sudo apt install golang
+```
+```bash
+go install github.com/hybridgroup/yzma/cmd/yzma@v1.9.0 
+echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc && source ~/.bashrc 
+```
+Install llama.cpp libraries via yzma:
 
 ```bash
 export YZMA_LIB=/home/arduino/yzma/lib
 yzma install -u --processor cpu --os trixie
 ```
-
 ---
+## EXPLAINED TUTORIAL from Arduino Project hub on how to install the models via yzma:
+```
+https://projecthub.arduino.cc/marc-edgeimpulse/running-local-llms-and-vlms-on-the-arduino-uno-q-with-yzma-74e288
+```
 
 ## 8. How your app consumes the models
 
