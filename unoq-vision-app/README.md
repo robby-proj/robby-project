@@ -483,3 +483,14 @@ yzma lib:
 app folder:
   /home/arduino/ArduinoApps/unoq-vision-app
 ```
+### 11. To run the project :
+```bash
+cd /home/arduino/ArduinoApps/unoq-vision-app
+```
+```bash
+docker compose down
+```
+```bash
+docker compose up -d --force-recreate
+```
+
