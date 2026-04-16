@@ -386,18 +386,25 @@ cd /home/arduino
 ```
 Install go and yzma:
 ```bash
-sudo apt update 
+sudo apt update
+```
+```bash
 sudo apt install golang
 ```
 ```bash
-go install github.com/hybridgroup/yzma/cmd/yzma@v1.9.0 
-echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc && source ~/.bashrc 
+go install github.com/hybridgroup/yzma/cmd/yzma@v1.9.0
 ```
+```bash
+echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc && source ~/.bashrc
+```
+```bash
 Install llama.cpp libraries via yzma:
-
+```
 ```bash
 export YZMA_LIB=/home/arduino/yzma/lib
-yzma install -u --processor cpu --os trixie
+```
+```bash
+yzma install -u --processor cpu --os bookworm
 ```
 ---
 ## EXPLAINED TUTORIAL from Arduino Project hub on how to install the models via yzma:
@@ -441,9 +448,17 @@ On the UNO Q host:
 
 ```bash
 ls -lh /home/arduino/models/coco/yolov8n.onnx
+```
+```bash
 ls -lh /home/arduino/models/coco/coco.names
+```
+```bash
 ls -lh /home/arduino/models/SmolVLM2-500M-Video-Instruct-Q8_0.gguf
+```
+```bash
 ls -lh /home/arduino/models/mmproj-SmolVLM2-500M-Video-Instruct-Q8_0.gguf
+```
+```bash
 ls -lh /home/arduino/yzma/lib
 ```
 
