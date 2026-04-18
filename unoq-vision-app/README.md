@@ -380,9 +380,14 @@ ls
 ls /home/arduino/yzma/lib
 ```
 If you don't have the folder at all:
-
 ```bash
 cd /home/arduino
+```
+```bash
+mkdir -p yzma
+```
+```bash
+cd /home/arduino/yzma
 ```
 Install go and yzma:
 ```bash
@@ -503,7 +508,42 @@ app folder:
 cd /home/arduino/ArduinoApps/unoq-vision-app
 ```
 ```bash
+docker compose build --no-cache
+```
+```bash
+docker compose up -d --force-recreate
+```
+```bash
+docker compose logs -f
+```
+if you want to stop the container or update any content on your docker-compose.yml repository :
+```bash
+cd /home/arduino/ArduinoApps/unoq-vision-app
+```
+```bash
 docker compose down
+```
+```
+Modify your code
+```
+```bash
+docker compose up -d --force-recreate
+```
+```bash
+docker compose logs -f
+```
+if you want to stop the container or update any content inside your docker container repository, the only difference is that you have rebuild again the image :
+```bash
+cd /home/arduino/ArduinoApps/unoq-vision-app
+```
+```bash
+docker compose down
+```
+```
+Modify your code
+```
+```bash
+docker compose build --no-cache
 ```
 ```bash
 docker compose up -d --force-recreate
