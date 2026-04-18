@@ -409,7 +409,7 @@ Install llama.cpp libraries via yzma:
 export YZMA_LIB=/home/arduino/yzma/lib
 ```
 ```bash
-yzma install -u --processor cpu --os bookworm
+yzma install -u --processor cpu --os trixie
 ```
 ---
 ## EXPLAINED TUTORIAL from Arduino Project hub on how to install the models via yzma:
