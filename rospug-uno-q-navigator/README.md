@@ -62,10 +62,10 @@ bash scripts/setup_rospug_ap.sh ROSPug-Pro 'ROSPugDemo2026' 5
 
 To switch the same profile back to the more widely compatible 2.4 GHz band, rerun it with `2.4`. The UNO Q's single `wlan0` radio exposes one selected band at a time; this configuration does not create simultaneous 2.4 GHz and 5 GHz SSIDs. Availability of 5 GHz access-point mode depends on the installed Wi-Fi hardware, driver, and regulatory domain. NetworkManager will report an activation error instead of silently falling back if 5 GHz AP mode is unavailable.
 
-The existing infrastructure profile, such as `RPG8592`, is not deleted. To leave access-point mode and reconnect to it:
+The existing infrastructure profile, such as `<your preferred wifi>`, is not deleted. To leave access-point mode and reconnect to it:
 
 ```bash
-bash scripts/switch_to_wifi.sh RPG8592
+bash scripts/switch_to_wifi.sh <your preferred wifi>
 ```
 
 To return to the access point later:
