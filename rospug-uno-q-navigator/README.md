@@ -43,7 +43,7 @@ Defaults:
 | Setting | Value |
 |---|---|
 | SSID | `ROSPug-Pro` |
-| Password | `ROSPugDemo2026` |
+| Password | `<your password>` |
 | UNO Q address | `10.42.0.1` |
 | Dashboard | `http://10.42.0.1:7000` |
 | Band | 2.4 GHz by default; selectable 5 GHz |
