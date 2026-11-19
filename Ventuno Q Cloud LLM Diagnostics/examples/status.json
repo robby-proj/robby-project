@@ -1,0 +1,33 @@
+{
+  "source": "sample-machine-controller",
+  "timestamp": "2026-11-18T14:00:00Z",
+  "status": "warning",
+  "parameters": {
+    "motor_temperature": {
+      "label": "Motor temperature",
+      "value": 72.4,
+      "unit": "C",
+      "status": "warning",
+      "normal_range": [10, 70],
+      "message": "Above preferred operating range"
+    },
+    "supply_voltage": {
+      "label": "Supply voltage",
+      "value": 23.9,
+      "unit": "V",
+      "status": "normal",
+      "normal_range": [22, 26]
+    },
+    "controller_connected": {
+      "label": "Controller connected",
+      "value": true,
+      "status": "normal"
+    }
+  },
+  "events": [
+    {
+      "severity": "warning",
+      "message": "Motor temperature crossed the preferred limit"
+    }
+  ]
+}

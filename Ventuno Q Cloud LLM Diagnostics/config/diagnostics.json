@@ -1,0 +1,27 @@
+{
+  "application_name": "Connected application",
+  "source": {
+    "type": "file",
+    "path": "examples/status.json"
+  },
+  "chat": {
+    "cloud_variable": "chat_message",
+    "reply_max_chars": 220,
+    "question_max_chars": 500,
+    "context_max_chars": 6000,
+    "stale_after_seconds": 120
+  },
+  "privacy": {
+    "allow_paths": [],
+    "deny_key_patterns": [
+      "password",
+      "passwd",
+      "token",
+      "secret",
+      "api_key",
+      "apikey",
+      "credential",
+      "private_key"
+    ]
+  }
+}

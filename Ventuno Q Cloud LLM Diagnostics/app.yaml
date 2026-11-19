@@ -1,0 +1,8 @@
+name: VENTUNO Q Cloud LLM Diagnostics
+description: Parameter-agnostic, on-device diagnostic chat for applications connected to a VENTUNO Q
+ports: []
+bricks:
+- arduino:arduino_cloud: {}
+- arduino:llm:
+    model: genie:qwen3_4b_instruct_2507
+icon: 🩺
