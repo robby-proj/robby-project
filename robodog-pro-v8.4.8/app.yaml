@@ -1,0 +1,10 @@
+name: Robodog Pro v8.4.8
+description: DOGZILLA AI robot dog with external Modulino face matrix, isolated SHANWAN gamepad input, safety latching, IMU collision response, OLEDs, buzzer, optional USB audio, camera and WebUI.
+ports: []
+bricks:
+- arduino:object_detection: {}
+- arduino:web_ui: {}
+- gamepad_input: {}
+- arduino:vibration_anomaly_detection:
+    model: fan-anomaly-detection
+icon: 🐕

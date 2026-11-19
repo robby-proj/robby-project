@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robodog Pro v8.4.6</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>🐕 Robodog Pro <span class="ver">v8.4.6</span>
+          <span class="sub">UNO Q + DOGZILLA + live IMU graph + MCU LEDs</span></h1>
+      </div>
+      <div id="event_banner" class="event idle"><span class="dot"></span><span id="event_text">Ready</span></div>
+      <div id="xyz_live">
+        <b>X</b> <span class="v" id="lx">0.000</span>
+        <b>Y</b> <span class="v" id="ly">0.000</span>
+        <b>Z</b> <span class="v" id="lz">0.000</span>
+        <b>vib</b> <span class="v" id="lv">0.000</span>
+        <b>pk</b> <span class="v" id="lpk">0.000</span>
+        <b>z</b> <span class="v" id="lz_score">0.0</span>
+      </div>
+      <div id="status">Starting...</div>
+    </header>
+
+    <!-- TOP ROW: compact camera | live graph | IMU telemetry -->
+    <section class="top-grid">
+      <div class="card cam-card">
+        <h2>USB Camera</h2>
+        <div class="camera-box">
+          <img id="camera_view" class="camera-view" alt="Camera stream loading...">
+          <div id="camera_status" class="camera-status">Camera starting...</div>
+        </div>
+        <div class="row">
+          <button onclick="refreshCamera()">Refresh</button>
+          <button onclick="cameraReset()">Reset</button>
+          <button onclick="cameraRotate(true)">Rot 180°</button>
+          <button onclick="cameraRotate(false)">Rot off</button>
+        </div>
+      </div>
+
+      <div class="card graph-card">
+        <h2>Live Accelerometer Graph <span class="badge" id="graph_src">z-score</span></h2>
+        <div class="graph-wrap">
+          <canvas id="accel_canvas" width="760" height="250"></canvas>
+          <div id="graph_flash" class="graph-flash"></div>
+          <div class="legend">
+            <span class="lg x">X</span><span class="lg y">Y</span><span class="lg z">Z</span><span class="lg vib">Vibration</span>
+            <span id="graph_state" class="gstate">idle</span>
+          </div>
+        </div>
+        <div class="row graph-controls">
+          <button id="freeze_btn" onclick="toggleFreeze()">⏸ Freeze</button>
+          <button onclick="clearGraph()">Clear</button>
+          <span class="anom">z=<b id="anom_z">0.0</b> mean=<b id="anom_mean">0.000</b> impacts=<b id="anom_impacts">0</b> src=<b id="anom_src">-</b></span>
+        </div>
+      </div>
+
+      <div class="card imu-card">
+        <h2>IMU Telemetry</h2>
+        <div class="vibration-panel">
+          <div class="vibration-main">
+            <div class="vibration-label">Vibration level</div>
+            <div class="vibration-value" id="vibration_value">0.000</div>
+            <div class="vibration-status" id="vibration_status">Waiting...</div>
+          </div>
+          <div class="accel-grid">
+            <div><b>X</b><br><span id="accel_x">0.000</span> G</div>
+            <div><b>Y</b><br><span id="accel_y">0.000</span> G</div>
+            <div><b>Z</b><br><span id="accel_z">0.000</span> G</div>
+          </div>
+        </div>
+        <h3>DOGZILLA IMU (real floats)</h3>
+        <div class="accel-grid four">
+          <div><b>Roll</b><br><span id="imu_roll">-</span>°</div>
+          <div><b>Pitch</b><br><span id="imu_pitch">-</span>°</div>
+          <div><b>Yaw</b><br><span id="imu_yaw">-</span>°</div>
+          <div><b>Batt</b><br><span id="imu_battery">-</span>%</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card compact-actions">
+      <h2>Preset Actions</h2>
+      <div id="actions" class="actions"></div>
+    </section>
+
+    <section class="card manual-card">
+      <h2>Manual Robot Controls</h2>
+      <div class="grid controls">
+        <button onclick="cmd('forward')">⬆ Forward</button>
+        <button onclick="cmd('left')">← Left</button>
+        <button class="stop" onclick="cmd('stop')">STOP</button>
+        <button onclick="cmd('right')">Right →</button>
+        <button onclick="cmd('backward')">⬇ Backward</button>
+        <button onclick="cmd('turn_left')">↺ Turn Left</button>
+        <button onclick="cmd('turn_right')">Turn Right ↻</button>
+        <button onclick="cmd('battery')">🔋 Battery</button>
+      </div>
+    </section>
+
+    <main class="dashboard">
+      <section class="card">
+        <h2>RGB LED Status <span class="badge">LED3/LED4</span></h2>
+        <table class="led-legend">
+          <thead><tr><th>Mood</th><th>Color</th><th>Meaning</th></tr></thead>
+          <tbody id="led_legend_body">
+            <tr data-mood="normal"><td>normal</td><td><span class="swatch" style="background:#22c55e"></span>green</td><td>manual / ready</td></tr>
+            <tr data-mood="happy"><td>happy</td><td><span class="swatch" style="background:#3b82f6"></span>blue</td><td>autonomous active</td></tr>
+            <tr data-mood="searching"><td>searching</td><td><span class="swatch" style="background:#f59e0b"></span>amber</td><td>scanning</td></tr>
+            <tr data-mood="detected"><td>detected</td><td><span class="swatch" style="background:#22d3ee"></span>cyan</td><td>person found</td></tr>
+            <tr data-mood="alert"><td>alert</td><td><span class="swatch" style="background:#ef4444"></span>red</td><td>impact / wall hit</td></tr>
+            <tr data-mood="low_energy"><td>low_energy</td><td><span class="swatch" style="background:#a855f7"></span>purple</td><td>low battery</td></tr>
+            <tr data-mood="sleeping"><td>sleeping</td><td><span class="swatch" style="background:#1e293b;border:1px solid #475569"></span>off</td><td>sleep</td></tr>
+          </tbody>
+        </table>
+        <small><span class="live-dot"></span> Highlighted row = current LED3 state (mode + mood). LED3 = primary, LED4 = event emphasis.</small>
+      </section>
+
+      <section class="card">
+        <h2>Diagnostics</h2>
+        <div class="diag-grid">
+          <div><b>Advertised IP:</b> <span id="diag_ip">-</span></div>
+          <div><b>Firmware:</b> <span id="diag_firmware">-</span></div>
+          <div><b>Bridge:</b> <span id="diag_bridge">-</span></div>
+          <div><b>Camera:</b> <span id="diag_camera">-</span></div>
+          <div><b>Mood:</b> <span id="diag_mood">-</span></div>
+          <div><b>Uptime:</b> <span id="diag_uptime">-</span> s</div>
+          <div><b>Captures on disk:</b> <span id="diag_captures">-</span></div>
+          <div><b>Build:</b> <span id="diag_build">-</span></div><div><b>Routes:</b> <span id="diag_routes">-</span></div><div><b>Workers:</b> <span id="diag_workers">-</span></div><div><b>Watchdog restarts:</b> <span id="diag_restarts">-</span></div>
+        </div>
+        <div class="row"><button onclick="rerunPrecheck()">Re-run precheck</button></div>
+      </section>
+
+      <section class="card">
+        <h2>Dog-like Walkaround <span class="badge">v8.4.5</span></h2>
+        <p><small>Scripted: look around, sniff, beg, circle, walk forward, wave. Runs in a background thread.</small></p>
+        <div class="row"><button onclick="walkaroundStart()">Start dog sequence</button><button class="stop" onclick="walkaroundStop()">Cancel + STOP</button></div>
+        <p id="sequence_status">Sequence idle.</p>
+      </section>
+
+      <section class="card">
+        <h2>Buzzer / LED Test</h2>
+        <div class="grid small-grid">
+          <button onclick="sfx('boot_complete')">Boot</button>
+          <button onclick="sfx('autonomous_started')">Auto</button>
+          <button onclick="sfx('walkaround_started')">Walk</button>
+          <button onclick="sfx('person_detected')">Found</button>
+          <button onclick="sfx('collision')">Wall</button>
+          <button onclick="sfx('hard_stop')">Hard STOP</button>
+          <button onclick="sfx('low_battery')">Low Batt</button>
+          <button onclick="audioMute(true)">Mute</button>
+        </div>
+      </section>
+
+      <section class="card span2">
+        <h2>Motion Policy and Diagnostics <span class="badge">v8.4.5</span></h2>
+        <div class="row">
+          <button onclick="motionSensitivity('off')">Off</button>
+          <button onclick="motionSensitivity('low')">Low, recommended</button>
+          <button onclick="motionSensitivity('medium')">Medium</button>
+          <button onclick="motionSensitivity('high')">High, bench only</button>
+          <button onclick="motionRebegin()">Re-begin Movement</button>
+          <button onclick="scanWire1()">Count Wire1 Devices</button>
+        </div>
+        <div class="diag-grid motion-diag">
+          <div><b>Present:</b> <span id="motion_present">-</span></div><div><b>Responds:</b> <span id="motion_responds">-</span></div>
+          <div><b>Address:</b> <span id="motion_addr">-</span></div><div><b>Sensitivity:</b> <span id="motion_sensitivity">-</span></div>
+          <div><b>Threshold:</b> <span id="motion_threshold">-</span> g</div><div><b>Local MCU STOP:</b> <span id="motion_local_stop">-</span></div>
+          <div><b>Magnitude:</b> <span id="motion_mag">-</span> g</div><div><b>Vibration:</b> <span id="motion_vibration">-</span></div>
+          <div><b>Confirm count:</b> <span id="motion_confirm">-</span></div><div><b>Cooldown:</b> <span id="motion_cooldown">-</span> ms</div>
+          <div><b>Reads:</b> <span id="motion_reads">-</span></div><div><b>Active samples:</b> <span id="motion_active">-</span></div>
+          <div><b>Wire1 count:</b> <span id="wire1_count">not scanned</span></div>
+        </div>
+        <p><small id="motion_note">At rest, magnitude should remain near 1.0 g and vibration should settle near zero.</small></p>
+      </section>
+      <section class="card">
+        <h2>Robot Eyes OLED</h2>
+        <div class="diag-grid">
+          <div><b>Present:</b> <span id="eyes_present">-</span></div>
+          <div><b>Address:</b> <span id="eyes_addr">-</span></div>
+          <div><b>Mode:</b> <span id="eyes_mode">-</span></div>
+          <div><b>Motion reactive:</b> <span id="eyes_motion">-</span></div>
+          <div><b>Flush OK:</b> <span id="eyes_flush_ok">-</span></div>
+          <div><b>Flush errors:</b> <span id="eyes_flush_errors">-</span></div>
+          <div><b>Bus fault:</b> <span id="eyes_bus_fault">-</span></div>
+          <div><b>Wire1 speed:</b> <span id="eyes_bus_hz">-</span> Hz</div>
+        </div>
+        <div class="row"><button onclick="eyesMode('demo')">Demo</button><button onclick="eyesMode('idle')">Idle</button><button onclick="eyesMode('scan')">Scan</button><button onclick="eyesMode('person')">Person</button><button onclick="eyesMode('alert')">Alert</button><button onclick="eyesMode('sleep')">Sleep</button><button onclick="eyesMode('dizzy')">Dizzy</button></div>
+        <div class="row"><button onclick="eyesMotion(true)">Motion Reactions On</button><button onclick="eyesMotion(false)">Motion Reactions Off</button></div>
+      </section>
+      <section class="card">
+        <h2>Vision and Camera Health</h2>
+        <div class="diag-grid"><div><b>Node:</b> <span id="camera_node">-</span></div><div><b>Frame age:</b> <span id="camera_age">-</span></div><div><b>Reopens:</b> <span id="camera_reopens">-</span></div><div><b>Rotation:</b> <span id="camera_rotation">-</span></div><div><b>Target:</b> <span id="vision_target">person</span></div><div><b>Found:</b> <span id="vision_found">-</span></div><div><b>Confidence:</b> <span id="vision_confidence">-</span></div><div><b>Labels:</b> <span id="vision_labels">-</span></div></div>
+        <p id="vision_summary"><small>No vision summary yet.</small></p>
+      </section>
+      <section class="card span2">
+        <h2>Advanced Controls</h2>
+        <h3>Pace</h3><div class="row"><button onclick="cmd('pace_normal')">Normal</button><button onclick="cmd('pace_slow')">Slow</button><button onclick="cmd('pace_high')">High</button></div>
+        <h3>Gait</h3><div class="row"><button onclick="cmd('gait_trot')">Trot</button><button onclick="cmd('gait_amble')">Amble</button><button onclick="cmd('gait_high')">High Walk</button></div>
+        <h3>IMU Self-Stabilize</h3><div class="row"><button onclick="cmd('imu_on')">IMU On</button><button onclick="cmd('imu_off')">IMU Off</button></div>
+        <h3>Servos</h3><div class="row"><button onclick="cmd('motors_on')">Servos On</button><button onclick="cmd('motors_off')">Servos Off</button><button onclick="unloadLeg(1)">Free Leg 1</button><button onclick="unloadLeg(2)">Free Leg 2</button><button onclick="unloadLeg(3)">Free Leg 3</button><button onclick="unloadLeg(4)">Free Leg 4</button></div>
+        <h3>Mood</h3><div class="row"><button onclick="mood('normal')">😐 Normal</button><button onclick="mood('happy')">😀 Happy</button><button onclick="mood('searching')">🔎 Searching</button><button onclick="mood('detected')">🎯 Detected</button><button onclick="mood('alert')">⚠️ Alert</button><button onclick="mood('sleeping')">💤 Sleep</button></div>
+      </section>
+
+      <section class="card span2">
+        <h2>Robot Chatbox</h2>
+        <div id="chat" class="chat"></div>
+        <form id="composer"><input id="prompt" placeholder="Message DOGZILLA..."><button type="submit">Send</button></form>
+      </section>
+    </main>
+
+    <section class="bottom-grid">
+      <div class="card">
+        <h2>Autonomy Modes and Ownership <span class="badge">v8.4.5</span></h2>
+        <p><small>Choose one motion owner at a time. IMU Wander performs obstacle-aware roaming. Vision Follow tracks the selected camera target. Manual mode sends STOP.</small></p>
+        <div class="row">
+          <button onclick="mode('autonomous_imu')">IMU Wander</button>
+          <button onclick="mode('autonomous_vision')">Vision Follow</button>
+          <button class="stop" onclick="mode('manual')">Manual + STOP</button>
+        </div>
+        <p id="autonomy_status">Autonomy idle.</p>
+        <div class="owner-strip">
+          <span>Mode: <b id="autonomy_mode">manual</b></span>
+          <span>Owner: <b id="autonomy_owner">manual</b></span>
+          <span>Phase: <b id="autonomy_phase">idle</b></span>
+        </div>
+        <h3>Vision Follow Profile</h3>
+        <div class="row">
+          <button onclick="followProfile('safe')">Safe</button>
+          <button onclick="followProfile('demo')">Demo</button>
+          <button onclick="followProfile('aggressive')">Aggressive</button>
+        </div>
+        <div class="row">
+          <button onclick="setReacquire(true)">Reacquire On</button>
+          <button onclick="setReacquire(false)">Reacquire Off</button>
+        </div>
+        <p><small>Profile: <b id="follow_profile">safe</b> | Reacquire: <b id="reacquire_enabled">on</b> | Last action: <b id="reacquire_action">none</b></small></p>
+      </div>
+      <div class="card">
+        <h2>OEM Wireless Controller <span class="badge">v8</span></h2>
+        <p id="controller_status">Checking receiver...</p>
+        <div id="controller_details" class="controller-map">Controller safety details loading...</div>
+        <div class="row"><button onclick="controllerEnable(true)">Enable + Rescan</button><button onclick="controllerRescan()">Rescan receiver</button><button class="stop" onclick="controllerEnable(false)">Disable + STOP</button></div>
+      </div>
+      <div class="card">
+        <h2>WiFi Access Point</h2>
+        <div class="wifi-box">
+          <div><b>SSID:</b> <span id="wifi_ssid">DOGZILLA-UNOQ</span></div>
+          <div><b>Password:</b> <span id="wifi_password">dogzilla123</span></div>
+          <div><b>URL:</b> <span id="wifi_url">http://10.42.0.1:7000</span></div>
+          <div><b>Status:</b> <span id="wifi_ap">not started</span></div>
+        </div>
+        <p><small>AP switching is host-level NetworkManager. Copy a command, paste it into the UNO Q host terminal, and expect Wi-Fi/SSH to disconnect when AP starts.</small></p>
+        <div class="row"><button onclick="copyApCommand('up')">Copy Start Command</button><button onclick="copyApCommand('down')">Copy Stop Command</button><button onclick="refreshState()">Refresh Status</button></div>
+      </div>
+    </section>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

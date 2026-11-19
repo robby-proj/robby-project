@@ -1,0 +1,22 @@
+profiles:
+  default:
+    fqbn: arduino:zephyr:unoq
+    platforms:
+      - platform: arduino:zephyr (0.90.0)
+    libraries:
+      - Arduino_RouterBridge (0.4.3)
+      - Arduino_RPClite (0.3.0)
+      - MsgPack (0.4.2)
+      - DebugLog (0.8.4)
+      - ArxTypeTraits (0.3.2)
+      - ArxContainer (0.7.0)
+      - Arduino_Modulino (0.9.0)
+      - dependency: STM32duino VL53L4CD (1.0.5)
+      - dependency: ArduinoGraphics (1.1.5)
+      - dependency: Arduino_HS300x (1.0.0)
+      - dependency: Arduino_LPS22HB (1.0.2)
+      - dependency: Arduino_LSM6DSOX (1.1.2)
+      - dependency: Arduino_LTR381RGB (1.0.1)
+      - STM32duino VL53L4ED (1.0.1)
+
+default_profile: default
