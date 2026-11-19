@@ -1,0 +1,6 @@
+platform,artifact,precision,size_mb,measurement_scope,notes
+UNO Q,NCNN weights,FP32,13.0,bin weights only,"Not the complete deployment package"
+UNO Q,NCNN weights,FP16 weights,6.2,bin weights only,"Not the complete deployment package"
+UNO Q,NCNN weights,INT8,3.2,bin weights only,"Not the complete deployment package; accuracy not yet evaluated"
+Jetson Nano,TensorRT engine,FP32,23,engine file,"Loaded inference engine"
+Jetson Nano,TensorRT engine,FP16-enabled,12,engine file,"FP16-enabled build; some layers may remain FP32"

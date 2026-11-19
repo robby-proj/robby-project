@@ -1,0 +1,12 @@
+platform,processor_path,runtime,precision,median_ms,mean_ms,tail_latency_ms,tail_percentile,notes
+Ventuno Q,Qualcomm NPU,QNN Execution Provider,FP32,32.43,32.74,34.21,p95,"5 warmups; 30 timed calls; zero input tensor"
+Ventuno Q,Qualcomm NPU,QNN Execution Provider,W8A8,10.24,10.22,12.79,p95,"Corrected split-output quantized model; 5 warmups; 30 timed calls; zero input tensor"
+Ventuno Q,CPU,ONNX Runtime,FP32,144.73,160.26,,,"CPU-only baseline; zero input tensor"
+Ventuno Q,CPU,ONNX Runtime,W8A8,40.86,40.90,41.18,p95,"Same corrected quantized model; zero input tensor"
+Jetson Nano,GPU,TensorRT 8.2.1.8,FP32,115.60,115.59,125.56,p99,"Loaded engine; trtexec end-to-end host latency; random input"
+Jetson Nano,GPU,TensorRT 8.2.1.8,FP16-enabled,71.31,70.87,76.49,p99,"Loaded engine; FP16 enabled, unsupported ops may run FP32; random input"
+UNO Q,CPU,NCNN,FP32,316.87,317.10,318.62,p95,"Four threads; zero input tensor"
+UNO Q,CPU,NCNN,INT8,296.34,299.42,312.77,p95,"Four threads; zero input tensor; INT8 quality not yet measured"
+UNO Q,CPU,NCNN,FP16 weights,327.28,327.52,328.99,p95,"Four threads; zero input tensor"
+UNO Q,Adreno Vulkan selected,NCNN,FP16 weights,2018.56,2018.75,2024.95,p95,"Exploratory; zero input; no per-layer placement profile"
+UNO Q,CPU,ONNX Runtime,FP32,726.86,728.43,738.92,p95,"CPU Execution Provider; zero input tensor"

@@ -1,0 +1,4 @@
+runtime,precision,images_evaluated,ground_truth_objects,predictions,true_positives,false_positives,false_negatives,precision_percent,recall_percent,f1_percent,notes
+QNN,FP32,31,216,131,111,20,105,84.73,51.39,63.98,"FP32 baseline; class score and box outputs reconstructed"
+QNN,W8A8,31,216,126,105,21,111,83.33,48.61,61.40,"Corrected split-output quantized model"
+QNN,W8A8 agreement with FP32,32,,,,,,,,,"89.3% same-class detection match at IoU >= 0.5; agreement is not ground-truth accuracy"
