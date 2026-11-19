@@ -1,0 +1,25 @@
+# Model and dataset artifacts
+*.onnx
+*.engine
+*.ncnn.bin
+*.param
+*.table
+*.pt
+*.pth
+*.gguf
+*.data
+*.zip
+calibration/
+datasets/
+
+# Credentials and local environments
+.qai_hub/
+.env
+.venv/
+venv/
+__pycache__/
+
+# Runtime and profiling output
+onnxruntime_profile_*.json
+*.log
+.DS_Store

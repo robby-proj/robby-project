@@ -1,0 +1,4 @@
+qai-hub
+onnx==1.18.0
+numpy
+opencv-python-headless
