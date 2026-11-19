@@ -1,0 +1,12 @@
+services:
+  gamepad-reader:
+    image: python:3.13-slim
+    restart: unless-stopped
+    command: ["python3", "-u", "/opt/gamepad/reader.py"]
+    volumes:
+      - "${APP_HOME:-.}/bricks/gamepad_input/reader.py:/opt/gamepad/reader.py:ro"
+      - "/dev/input:/dev/input:ro"
+    device_cgroup_rules:
+      - "c 13:* r"
+    group_add:
+      - "995"
