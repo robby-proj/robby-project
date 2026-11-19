@@ -1,0 +1,16 @@
+{
+  "quiet_hours": [0, 1, 2, 3, 4],
+  "min_power_w_quiet": 30.0,
+  "min_delta_kwh_trigger": 0.001,
+  "cooldown_minutes": 60,
+  "z_threshold": 3.0,
+  "baseline_min_samples": 10,
+
+  "waste_hours_per_day": 2.0,
+  "fix_effectiveness": 0.9,
+
+  "active_power_w": 30.0,
+  "summary_every_sec": 300,
+  "top_n": 5,
+  "verbose": true
+}

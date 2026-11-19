@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: unoq-mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  energy-coach:
+    build: ./coach
+    container_name: unoq-energy-coach
+    restart: unless-stopped
+    environment:
+      MQTT_HOST: mqtt
+      MQTT_PORT: 1883
+      MQTT_SUB: "opta/+/+/+/telemetry"
+      MQTT_PUB: "coach/recipe/recommendations"
+      SUMMARY_TOPIC: "coach/summary/top_consumers"
+      STATE_DB: "/app/state/state.sqlite"
+      CONFIG_PATH: "/app/config.json"
+      MODELS_DIR: "/app/models"
+    volumes:
+      - ./coach/state:/app/state
+      - ./coach/models:/app/models
+      - ./coach/config.json:/app/config/json:ro
+    depends_on:
+      - mqtt
+
+  cloud-bridge:
+    build: ./cloud_bridge
+    container_name: unoq-cloud-bridge
+    restart: unless-stopped
+    environment:
+      MQTT_HOST: mqtt
+      MQTT_PORT: 1883
+      SUB_TOPICS: "coach/summary/top_consumers,coach/recipe/recommendations"
+      ARDUINO_DEVICE_ID: ""
+      ARDUINO_SECRET_KEY: ""
+    depends_on:
+      - mqtt
