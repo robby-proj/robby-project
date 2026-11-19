@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ROSPug UNO Q Console</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">UNO Q · UART + USB autonomy</p>
+          <h1>ROSPug Console</h1>
+        </div>
+        <div id="connection-pill" class="pill offline"><span></span> Waiting</div>
+      </header>
+
+      <section class="warning">
+        <strong>Clear the robot before arming.</strong>
+        Initializing can move all 12 joints immediately. Software lock does not remove servo power;
+        use the robot's physical power switch for an emergency stop. Auto Avoid begins walking as
+        soon as it is selected.
+      </section>
+
+      <section class="grid metrics">
+        <article class="card metric">
+          <span>UART frames</span><strong id="frames">0</strong>
+        </article>
+        <article class="card metric">
+          <span>CRC errors</span><strong id="crc-errors">0</strong>
+        </article>
+        <article class="card metric">
+          <span>Last frame</span><strong id="frame-age">—</strong>
+        </article>
+        <article class="card metric">
+          <span>Battery report</span><strong id="battery">—</strong>
+        </article>
+        <article class="card metric">
+          <span>USB gamepad</span><strong id="gamepad-metric">—</strong>
+        </article>
+        <article class="card metric">
+          <span>LD19 scan</span><strong id="lidar-metric">—</strong>
+        </article>
+      </section>
+
+      <section class="grid main-grid">
+        <article class="card network-card">
+          <div class="card-heading">
+            <div><p class="eyebrow">Offline demonstration</p><h2>ROSPug Wi-Fi dashboard</h2></div>
+            <span class="badge armed">AP ready</span>
+          </div>
+          <div class="network-grid">
+            <div><span>Wi-Fi network</span><strong>ROSPug-Pro</strong></div>
+            <div><span>Selectable band</span><strong>2.4 GHz / 5 GHz</strong></div>
+            <div><span>Dashboard address</span><strong id="dashboard-url">http://10.42.0.1:7000</strong></div>
+          </div>
+          <div class="button-row network-actions">
+            <button id="copy-dashboard-url" class="secondary">Copy dashboard address</button>
+          </div>
+          <p class="fine-print">
+            The access point is configured once on the UNO Q host using the included setup script.
+            It does not require a router or Internet connection. AWS/TPS services require Ethernet
+            or a second network connection while Wi-Fi is operating as the access point.
+          </p>
+        </article>
+
+        <article class="card controls">
+          <div class="card-heading">
+            <div><p class="eyebrow">Safety interlock</p><h2>Controller</h2></div>
+            <span id="armed-badge" class="badge locked">Locked</span>
+          </div>
+
+          <label class="confirm-row">
+            <input id="safety-check" type="checkbox" />
+            <span>I have supported the robot and cleared hands, cables, and tools.</span>
+          </label>
+
+          <div class="button-row">
+            <button id="arm-button" class="primary" disabled>Initialize &amp; Stand</button>
+            <button id="lock-button" class="secondary">Software Lock</button>
+          </div>
+
+          <p class="fine-print">
+            Initialize &amp; Stand sends the verified ROSPug robot-type command. Software Lock first
+            sends the controller's Stop command, but servo power remains live.
+          </p>
+          <div id="action-message" class="message" aria-live="polite"></div>
+        </article>
+
+        <article class="card">
+          <div class="card-heading">
+            <div><p class="eyebrow">Function 0x07</p><h2>Live IMU payload</h2></div>
+            <span id="imu-count" class="muted">0 frames</span>
+          </div>
+          <div class="imu-grid">
+            <div><span>Value 0</span><strong id="imu-0">0.00000</strong></div>
+            <div><span>Value 1</span><strong id="imu-1">0.00000</strong></div>
+            <div><span>Value 2</span><strong id="imu-2">0.00000</strong></div>
+            <div><span>Value 3</span><strong id="imu-3">0.00000</strong></div>
+            <div><span>Value 4</span><strong id="imu-4">0.00000</strong></div>
+            <div><span>Value 5</span><strong id="imu-5">0.00000</strong></div>
+          </div>
+          <p class="fine-print">Raw six-float order is preserved until the SDK axis mapping is verified.</p>
+        </article>
+
+        <article class="card autonomy-card">
+          <div class="card-heading">
+            <div><p class="eyebrow">Gamepad + LD19</p><h2>Navigation safety</h2></div>
+            <span id="mode-badge" class="badge locked">LiDAR Guard</span>
+          </div>
+
+          <div class="device-row">
+            <div><span id="gamepad-badge" class="badge locked">Gamepad offline</span><small id="gamepad-path">—</small></div>
+            <div><span id="lidar-badge" class="badge locked">LD19 offline</span><small id="lidar-path">—</small></div>
+          </div>
+
+          <p class="section-label">Control mode</p>
+          <div class="mode-buttons">
+            <button class="mode-button secondary" data-mode="manual">Manual</button>
+            <button class="mode-button secondary" data-mode="guard">LiDAR Guard</button>
+            <button class="mode-button secondary auto-mode" data-mode="auto">Auto Avoid</button>
+          </div>
+          <p class="fine-print mode-help">
+            Manual bypasses LiDAR. Guard limits only the commanded direction. Auto selects an open
+            front, side-turn, or rear escape route. A deliberate joystick or D-pad movement cancels Auto.
+          </p>
+
+          <div class="sector-grid">
+            <div><span>Front</span><strong id="sector-front">—</strong></div>
+            <div><span>Left</span><strong id="sector-left">—</strong></div>
+            <div><span>Right</span><strong id="sector-right">—</strong></div>
+            <div><span>Rear</span><strong id="sector-rear">—</strong></div>
+          </div>
+          <div class="nav-status">
+            <span>Input: <strong id="input-source">none</strong></span>
+            <span>Auto state: <strong id="auto-state">idle</strong></span>
+            <span>LiDAR packets: <strong id="lidar-packets">0</strong></span>
+            <span>LiDAR CRC errors: <strong id="lidar-crc">0</strong></span>
+          </div>
+          <div id="blocked-reason" class="readout">Waiting for sensors.</div>
+
+          <details class="remote-map">
+            <summary>Factory remote mapping</summary>
+            <p>Left stick: forward/back/strafe · Right stick X: rotate · D-pad: forward/back/rotate</p>
+            <p>Square/Circle: strafe · Cross/Triangle: raise/lower · L1/L2: pitch · R1/R2: roll</p>
+            <p>START: neutral pose · SELECT: Manual/Guard toggle · L3: immediate Stop</p>
+          </details>
+        </article>
+
+        <article class="card lidar-map-card">
+          <div class="card-heading lidar-map-heading">
+            <div>
+              <p class="eyebrow">Live 360° local scan</p>
+              <h2>LD19 LiDAR view</h2>
+            </div>
+            <div class="map-tools">
+              <span id="map-point-count" class="muted">0 points</span>
+              <label for="map-range">Range</label>
+              <select id="map-range">
+                <option value="1.5">1.5 m</option>
+                <option value="3" selected>3 m</option>
+                <option value="6">6 m</option>
+                <option value="12">12 m</option>
+              </select>
+            </div>
+          </div>
+          <div class="lidar-canvas-wrap">
+            <canvas id="lidar-map" role="img" aria-label="Live top-down LD19 LiDAR scan">
+              Live LiDAR visualization requires canvas support.
+            </canvas>
+            <div class="map-compass" aria-hidden="true">
+              <span class="north">FRONT</span><span class="west">LEFT</span>
+              <span class="east">RIGHT</span><span class="south">REAR</span>
+            </div>
+            <div id="map-overlay" class="map-overlay">Waiting for LD19 scan data</div>
+          </div>
+          <div class="map-legend">
+            <span><i class="dot return"></i>LiDAR return</span>
+            <span><i class="dot slow"></i>Slow zone · 0.75 m</span>
+            <span><i class="dot stop"></i>Stop zone · 0.32 m</span>
+            <span><i class="arrow-key">↑</i>Commanded motion</span>
+          </div>
+          <p class="fine-print map-note">
+            This is a robot-centered local scan for obstacle awareness, not a persistent SLAM map.
+            The display rotates and moves with the ROSPug.
+          </p>
+        </article>
+
+        <article class="card motion-card">
+          <div class="card-heading">
+            <div><p class="eyebrow">Verified kinematics · function 0x0B</p><h2>Motion control</h2></div>
+            <span id="motion-badge" class="badge locked">Stopped</span>
+          </div>
+
+          <div class="motion-layout">
+            <div class="drive-panel">
+              <p class="section-label">Press and hold to move</p>
+              <div class="drive-grid">
+                <button class="drive rotate" data-direction="rotate_left" aria-label="Rotate left">↺</button>
+                <button class="drive" data-direction="forward" aria-label="Move forward">↑</button>
+                <button class="drive rotate" data-direction="rotate_right" aria-label="Rotate right">↻</button>
+                <button class="drive" data-direction="left" aria-label="Strafe left">←</button>
+                <button id="stop-button" class="stop-button" aria-label="Stop">STOP</button>
+                <button class="drive" data-direction="right" aria-label="Strafe right">→</button>
+                <span></span>
+                <button class="drive" data-direction="backward" aria-label="Move backward">↓</button>
+                <span></span>
+              </div>
+              <p class="fine-print">Releasing a button sends Stop. The MCU also stops automatically after 650 ms without a refresh.</p>
+            </div>
+
+            <div class="preset-panel">
+              <p class="section-label">Hiwonder factory examples</p>
+              <label for="gait-select">Gait preset</label>
+              <select id="gait-select" data-motion-control disabled>
+                <option value="1">Trot · 0.20 / 0.18 / 0.02 / 0.04</option>
+                <option value="2">Amble · 0.20 / 0.15 / 0.05 / 0.04</option>
+                <option value="3">Walk · 0.24 / 0.12 / 0.05 / 0.04</option>
+                <option value="4">Fast Trot · 0.14 / 0.14 / 0.00 / 0.04</option>
+                <option value="5">Smooth Fast Trot · 0.14 / 0.13 / 0.00 / 0.03</option>
+              </select>
+              <div class="preset-buttons">
+                <button id="apply-gait" class="secondary" data-motion-control disabled>Load gait</button>
+                <button id="home-button" class="secondary" data-motion-control disabled>Neutral pose</button>
+              </div>
+              <p class="fine-print">
+                Smooth Fast Trot lowers the foot lift and uses acceleration/braking ramps to reduce
+                body jerk. Test with the robot supported first. Neutral pose: x 0, y 0, z −0.13 m,
+                x-shift 0.01 m, roll/pitch 0°, duration 0.5 s.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card servo-card">
+          <div class="card-heading">
+            <div><p class="eyebrow">Read-only diagnostic</p><h2>Bus servo position</h2></div>
+          </div>
+          <div class="servo-row">
+            <label for="servo-id">Servo ID</label>
+            <select id="servo-id"></select>
+            <button id="read-servo" class="secondary">Read position</button>
+          </div>
+          <div id="servo-result" class="readout">No servo queried yet.</div>
+        </article>
+
+        <article class="card wiring-card">
+          <div class="card-heading"><div><p class="eyebrow">Verified wiring</p><h2>Adapter → UNO Q</h2></div></div>
+          <dl>
+            <div><dt>Pin 1 · 3.3 V</dt><dd>3.3 V</dd></div>
+            <div><dt>Pin 6 · GND</dt><dd>GND</dd></div>
+            <div><dt>Pin 8 · TX</dt><dd>D0 / RX</dd></div>
+            <div><dt>Pin 10 · RX</dt><dd>D1 / TX</dd></div>
+            <div class="danger"><dt>Pin 2 · 5 V</dt><dd>Disconnected</dd></div>
+          </dl>
+        </article>
+      </section>
+
+      <footer><span id="bridge-error"></span><span>ROSPug Navigator v0.7.0</span></footer>
+    </main>
+
+    <script src="libs/socket.io.min.js"></script>
+    <script src="libs/arduino.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

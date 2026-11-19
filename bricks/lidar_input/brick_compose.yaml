@@ -1,0 +1,17 @@
+services:
+  lidar-reader:
+    image: python:3.13-slim
+    restart: unless-stopped
+    command: ["python3", "-u", "/opt/lidar/reader.py"]
+    environment:
+      ROSPUG_LIDAR_FRONT_OFFSET_DEG: "${ROSPUG_LIDAR_FRONT_OFFSET_DEG:-0}"
+    volumes:
+      - "${APP_HOME:-.}/bricks/lidar_input/reader.py:/opt/lidar/reader.py:ro"
+      - "/dev:/host-dev:ro"
+      - "/dev/bus/usb:/dev/bus/usb"
+    device_cgroup_rules:
+      - "c 188:* r"
+      - "c 189:* rw"
+    group_add:
+      - "0"
+      - "20"

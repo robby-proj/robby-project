@@ -1,0 +1,8 @@
+name: ROSPug UNO Q Navigator v0.7.0
+description: Control a Hiwonder ROSPug with USB remote, LD19 avoidance, and an offline Wi-Fi dashboard
+ports: []
+bricks:
+- arduino:web_ui: {}
+- gamepad_input: {}
+- lidar_input: {}
+icon: 🐕
